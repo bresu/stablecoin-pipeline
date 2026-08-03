@@ -1,10 +1,24 @@
 tokens:
   USDT:
-    address: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
-    decimals: 6
     enabled: true
+    address: "dac17f958d2ee523a2206206994597c13d831ec7"
+    decimals: 6
     setup_token_view: false
-    transfer_filter: "all"
+    transfer_filter: all
+
+    analyses:
+      monthly_activity: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  WBTC:
+    enabled: true
+    address: "2260fac5e5542a773aa44fbcfedf7c193bc2c599"
+    decimals: 8
+    setup_token_view: false
+    transfer_filter: all
 
     analyses:
       monthly_activity: true

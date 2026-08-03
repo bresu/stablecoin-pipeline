@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-PG_DSN = os.getenv("PG_DSN")
+PG_DSN = os.getenv("ETH_PG_DSN")
 CONFIG_PATH = Path("config/tokens.yaml")
 OUTPUT_DIR = Path("output")
 OUTPUT_DIR.mkdir(exist_ok=True)
@@ -192,6 +192,128 @@ def monthly_activity(conn, symbol: str, view: str, decimals: int, transfer_filte
         OUTPUT_DIR / f"{s}_{transfer_filter}_monthly_activity.csv"
     )
 
+def monthly_summary(
+    conn,
+    symbol: str,
+    view: str,
+    decimals: int,
+    transfer_filter: str,
+) -> None:
+    """
+    Export one row per month containing:
+
+    - WBTC transfer volume
+    - ERC-20 Transfer event count
+    - Distinct Ethereum transaction count
+    - Unique active addresses
+    - Addresses appearing for the first time
+    """
+    s = safe_name(symbol)
+
+    sql = f"""
+    WITH zero_address AS (
+        SELECT id
+        FROM address
+        WHERE addr = decode(repeat('00', 20), 'hex')
+    ),
+
+    monthly_transfers AS (
+        SELECT
+            date_trunc('month', b.ts)::date AS month,
+
+            -- Number of ERC-20 Transfer events
+            COUNT(*) AS transfer_count,
+
+            -- Number of distinct Ethereum transactions containing
+            -- at least one WBTC Transfer event
+            COUNT(
+                DISTINCT (t.block_number, t.tx_index)
+            ) AS transaction_count,
+
+            -- Volume expressed in whole tokens rather than raw units
+            SUM(t.amount) /
+                POWER(10::numeric, {decimals}) AS token_volume
+
+        FROM {view} t
+        JOIN eth_block b
+          ON b.block_number = t.block_number
+        GROUP BY 1
+    ),
+
+    participant_events AS (
+        SELECT
+            date_trunc('month', b.ts)::date AS month,
+            t.from_id AS address_id
+        FROM {view} t
+        JOIN eth_block b
+          ON b.block_number = t.block_number
+
+        UNION ALL
+
+        SELECT
+            date_trunc('month', b.ts)::date AS month,
+            t.to_id AS address_id
+        FROM {view} t
+        JOIN eth_block b
+          ON b.block_number = t.block_number
+    ),
+
+    cleaned_participants AS (
+        SELECT
+            month,
+            address_id
+        FROM participant_events
+        WHERE address_id IS NOT NULL
+          AND address_id NOT IN (
+              SELECT id
+              FROM zero_address
+          )
+    ),
+
+    monthly_active_addresses AS (
+        SELECT
+            month,
+            COUNT(DISTINCT address_id) AS unique_addresses
+        FROM cleaned_participants
+        GROUP BY month
+    ),
+
+    address_first_seen AS (
+        SELECT
+            address_id,
+            MIN(month) AS first_seen_month
+        FROM cleaned_participants
+        GROUP BY address_id
+    ),
+
+    monthly_new_addresses AS (
+        SELECT
+            first_seen_month AS month,
+            COUNT(*) AS new_addresses
+        FROM address_first_seen
+        GROUP BY first_seen_month
+    )
+
+    SELECT
+        mt.month,
+        mt.token_volume,
+        maa.unique_addresses,
+        COALESCE(mna.new_addresses, 0) AS new_addresses,
+        mt.transaction_count,
+        mt.transfer_count
+    FROM monthly_transfers mt
+    JOIN monthly_active_addresses maa
+      ON maa.month = mt.month
+    LEFT JOIN monthly_new_addresses mna
+      ON mna.month = mt.month
+    ORDER BY mt.month;
+    """
+
+    export_query(
+        conn,
+        sql,
+        OUTPUT_DIR / f"{s}_{transfer_filter}_monthly_summary.csv",
+    )
 
 def monthly_adoption_and_funded_by(conn, symbol: str, view: str, decimals: int, transfer_filter: str) -> None:
     s = safe_name(symbol)
@@ -381,7 +503,7 @@ def monthly_transfer_size_buckets(conn, symbol: str, view: str, decimals: int, t
 
 def run_pipeline() -> None:
     if not PG_DSN:
-        raise RuntimeError("Missing PG_DSN in .env")
+        raise RuntimeError("Missing ETH_PG_DSN in .env")
 
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
@@ -406,6 +528,15 @@ def run_pipeline() -> None:
 
             if analyses.get("monthly_activity", False):
                 monthly_activity(conn, symbol, view, decimals, transfer_filter)
+
+            if analyses.get("monthly_summary", False):
+                monthly_summary(
+                    conn,
+                    symbol,
+                    view,
+                    decimals,
+                    transfer_filter,
+                )
 
             if analyses.get("monthly_adoption_and_funded_by", False):
                 monthly_adoption_and_funded_by(conn, symbol, view, decimals, transfer_filter)
