@@ -1,28 +1,178 @@
-tokens:
-  USDT:
-    enabled: true
-    address: "dac17f958d2ee523a2206206994597c13d831ec7"
-    decimals: 6
-    setup_token_view: false
-    transfer_filter: all
+settings:
+  # Safety check against accidentally running on the BSC database.
+  expected_database: ethereum1
 
+  # Reads decimals() from ETH_RPC_URL before each token is processed.
+  verify_decimals: true
+
+tokens:
+  # New token views: create once, then run every current analysis.
+  A7A5:
+    enabled: true
+    address: "0x6fA0BE17e4beA2fCfA22ef89BF8ac9aab0AB0fc9"
+    decimals: 6
+    setup_token_view: true
+    transfer_filter: all
     analyses:
       monthly_activity: true
+      monthly_summary: true
       monthly_adoption_and_funded_by: true
       monthly_top_users: true
       transfer_size_histogram_all_time: true
       monthly_transfer_size_buckets: true
 
+  MXNT:
+    enabled: true
+    address: "0xed03Ed872159e199065401b6d0D487d78d9464AA"
+    decimals: 6
+    setup_token_view: true
+    transfer_filter: all
+    analyses:
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  USDS:
+    enabled: true
+    address: "0xdC035D45d973E3EC169d2276DDab16f1e407384F"
+    decimals: 18
+    setup_token_view: true
+    transfer_filter: all
+    analyses:
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  PYUSD:
+    enabled: true
+    address: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
+    decimals: 6
+    setup_token_view: true
+    transfer_filter: all
+    analyses:
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  EURC:
+    enabled: true
+    address: "0x1aBaEA1f7C830bD89Acc67eC4af516284b1bC33c"
+    decimals: 6
+    setup_token_view: true
+    transfer_filter: all
+    analyses:
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  CNHT:
+    enabled: true
+    address: "0x6E109E9dD7Fa1a58BC3eff667e8e41fC3cc07AEF"
+    decimals: 6
+    setup_token_view: true
+    transfer_filter: all
+    analyses:
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  BRZ:
+    enabled: true
+    address: "0x01d33FD36ec67c6Ada32cf36b31e88EE190B1839"
+    decimals: 18
+    setup_token_view: true
+    transfer_filter: all
+    analyses:
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  USDE:
+    enabled: true
+    address: "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3"
+    decimals: 18
+    setup_token_view: true
+    transfer_filter: all
+    analyses:
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  DAI:
+    enabled: true
+    address: "0x6B175474E89094C44Da98b954EedeAC495271d0F"
+    decimals: 18
+    setup_token_view: true
+    transfer_filter: all
+    analyses:
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  USDC:
+    enabled: true
+    address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    decimals: 6
+    setup_token_view: true
+    transfer_filter: all
+    analyses:
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  # Existing, already-refreshed views: rerun only the two bucket analyses
+  # so their CSVs use the new 100K-1M, 1M-10M and >=10M buckets.
   WBTC:
     enabled: true
-    address: "2260fac5e5542a773aa44fbcfedf7c193bc2c599"
+    address: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"
     decimals: 8
     setup_token_view: false
     transfer_filter: all
-
     analyses:
-      monthly_activity: true
-      monthly_adoption_and_funded_by: true
-      monthly_top_users: true
+      monthly_activity: false
+      monthly_summary: false
+      monthly_adoption_and_funded_by: false
+      monthly_top_users: false
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  USDT:
+    enabled: true
+    address: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+    decimals: 6
+    setup_token_view: false
+    transfer_filter: all
+    analyses:
+      monthly_activity: false
+      monthly_summary: false
+      monthly_adoption_and_funded_by: false
+      monthly_top_users: false
       transfer_size_histogram_all_time: true
       monthly_transfer_size_buckets: true
