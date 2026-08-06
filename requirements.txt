@@ -1,5 +1,8 @@
+narwhals==2.20.0
 numpy==2.4.4
+packaging==26.2
 pandas==3.0.2
+plotly==6.7.0
 psycopg==3.3.4
 psycopg-binary==3.3.4
 python-dateutil==2.9.0.post0
