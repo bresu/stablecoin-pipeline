@@ -190,6 +190,40 @@ def materialized_view_exists(conn, view: str) -> bool:
         return bool(cur.fetchone()[0])
 
 
+def relation_kind(conn, name: str) -> str | None:
+    """Return PostgreSQL relkind for public.<name>, or None if it does not exist.
+
+    Relevant values:
+      m = materialized view
+      r = ordinary table
+    """
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT c.relkind
+            FROM pg_class c
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE n.nspname = 'public'
+              AND c.relname = %s
+            """,
+            (name,),
+        )
+        row = cur.fetchone()
+    return row[0] if row else None
+
+
+def transfer_relation_exists(conn, name: str) -> bool:
+    return relation_kind(conn, name) in {"m", "r"}
+
+
+def ensure_transfer_relation_exists(conn, name: str) -> None:
+    if not transfer_relation_exists(conn, name):
+        raise RuntimeError(
+            f"Required transfer relation public.{name} does not exist "
+            "as a materialized view or table"
+        )
+
+
 def ensure_materialized_view_exists(conn, view: str) -> None:
     if not materialized_view_exists(conn, view):
         raise RuntimeError(f"Required materialized view public.{view} does not exist")
@@ -216,13 +250,22 @@ def materialized_view_comment(conn, view: str) -> str | None:
 
 
 def base_view_is_success_filtered(conn, view: str) -> bool:
-    """Return True when an existing base view explicitly filters tx.success IS TRUE."""
-    if not materialized_view_exists(conn, view):
+    """Return True when the managed token base relation is success-filtered.
+
+    Legacy materialized views can be migrated to an ordinary snapshot table.
+    Tables do not retain a query definition, so the pipeline version comment is
+    the authoritative marker for those migrated relations.
+    """
+    kind = relation_kind(conn, view)
+    if kind not in {"m", "r"}:
         return False
 
     comment = materialized_view_comment(conn, view)
     if comment == BASE_VIEW_COMMENT:
         return True
+
+    if kind != "m":
+        return False
 
     definition = materialized_view_definition(conn, view)
     normalized = re.sub(r"\s+", " ", definition).lower()
@@ -334,20 +377,42 @@ def drop_known_filtered_views(conn, symbol: str) -> None:
 
 def migrate_legacy_base_view(conn, symbol: str, view: str) -> None:
     """
-    One-time migration path for a legacy token-specific materialized view.
+    One-time migration of a legacy token materialized view to a success-filtered
+    managed snapshot table.
 
-    Instead of rescanning the entire erc20_transfer table, build the successful-
-    transaction version from the already token-filtered legacy view, then swap it
-    into place. The old view is only dropped after the replacement has been fully
-    materialized, which also makes an interrupted migration safer.
+    PostgreSQL records a dependency when one materialized view is created from
+    another materialized view. Therefore a temporary success-filtered materialized
+    view cannot be swapped in by dropping its source view. CREATE TABLE AS copies
+    the filtered rows without retaining that source dependency, so the legacy view
+    can then be removed safely.
+
+    A __success_tmp materialized view left by the older broken migration is dropped
+    first. This intentionally recomputes the success filter, but avoids needing disk
+    space for the old view + old temp view + a third full-size staging copy.
     """
     tmp_view = f"{view}__success_tmp"
+    stage_table = f"{view}__success_stage"
 
-    # Clean up a temp view left by an interrupted earlier migration.
-    run_sql(conn, f"DROP MATERIALIZED VIEW IF EXISTS public.{tmp_view};")
+    # Recovery from the dependency error in the previous pipeline version. The
+    # legacy base view is still intact, so removing this temp object loses no source
+    # data and keeps peak disk usage lower.
+    if materialized_view_exists(conn, tmp_view):
+        print(
+            f"[recover] {view}: dropping obsolete temp view {tmp_view}; "
+            "legacy base remains intact"
+        )
+        run_sql(conn, f"DROP MATERIALIZED VIEW public.{tmp_view};")
 
+    if relation_kind(conn, stage_table) == "r":
+        print(f"[recover] {view}: removing stale staging table {stage_table}")
+        run_sql(conn, f"DROP TABLE public.{stage_table};")
+
+    print(
+        f"[migrate] {view}: building independent success-filtered staging table "
+        "from existing token view"
+    )
     sql = f"""
-    CREATE MATERIALIZED VIEW public.{tmp_view} AS
+    CREATE TABLE public.{stage_table} AS
     SELECT t.*
     FROM public.{view} t
     JOIN public.eth_tx tx
@@ -355,21 +420,30 @@ def migrate_legacy_base_view(conn, symbol: str, view: str) -> None:
      AND tx.tx_index = t.tx_index
     WHERE tx.success IS TRUE;
     """
-    print(
-        f"[migrate] {view}: building success-filtered replacement from existing token view"
-    )
     run_sql(conn, sql)
 
-    # Only after the replacement exists do we remove managed dependants and swap.
+    # Only after the independent copy exists do we remove managed dependants and
+    # replace the legacy base relation. No CASCADE is used anywhere.
     drop_known_filtered_views(conn, symbol)
-    run_sql(conn, f"DROP MATERIALIZED VIEW public.{view};")
+
+    kind = relation_kind(conn, view)
+    if kind == "m":
+        run_sql(conn, f"DROP MATERIALIZED VIEW public.{view};")
+    elif kind == "r":
+        run_sql(conn, f"DROP TABLE public.{view};")
+    else:
+        raise RuntimeError(
+            f"{symbol}: expected legacy base relation public.{view} disappeared "
+            "during migration"
+        )
+
     run_sql(
         conn,
-        f"ALTER MATERIALIZED VIEW public.{tmp_view} RENAME TO {view};",
+        f"ALTER TABLE public.{stage_table} RENAME TO {view};",
     )
     run_sql(
         conn,
-        f"COMMENT ON MATERIALIZED VIEW public.{view} IS '{BASE_VIEW_COMMENT}';",
+        f"COMMENT ON TABLE public.{view} IS '{BASE_VIEW_COMMENT}';",
     )
 
 
@@ -392,7 +466,7 @@ def setup_token_view(
     """
     view = transfer_view_name(symbol)
     token_id = int(ensure_token_in_database(conn, symbol, address))
-    exists = materialized_view_exists(conn, view)
+    exists = transfer_relation_exists(conn, view)
     current = base_view_is_success_filtered(conn, view) if exists else False
 
     if exists and rebuild_mode == "if_legacy" and not current:
@@ -414,7 +488,13 @@ def setup_token_view(
             )
         print(f"[rebuild] {view}: dropping managed filtered views first")
         drop_known_filtered_views(conn, symbol)
-        run_sql(conn, f"DROP MATERIALIZED VIEW public.{view};")
+        kind = relation_kind(conn, view)
+        if kind == "m":
+            run_sql(conn, f"DROP MATERIALIZED VIEW public.{view};")
+        elif kind == "r":
+            run_sql(conn, f"DROP TABLE public.{view};")
+        else:
+            raise RuntimeError(f"{symbol}: public.{view} disappeared before rebuild")
         exists = False
         current = False
 
@@ -460,7 +540,33 @@ def setup_token_view(
 
     if refresh_existing and not created:
         print(f"[refresh] {view}: incorporating latest base-table data")
-        run_sql(conn, f"REFRESH MATERIALIZED VIEW public.{view};")
+        kind = relation_kind(conn, view)
+        if kind == "m":
+            run_sql(conn, f"REFRESH MATERIALIZED VIEW public.{view};")
+        elif kind == "r":
+            # Migrated legacy bases are managed snapshot tables. Refill the table
+            # in one transaction so a failed refresh rolls back to the old snapshot.
+            try:
+                with conn.cursor() as cur:
+                    cur.execute(f"TRUNCATE TABLE public.{view};")
+                    cur.execute(
+                        f"""
+                        INSERT INTO public.{view}
+                        SELECT t.*
+                        FROM public.erc20_transfer t
+                        JOIN public.eth_tx tx
+                          ON tx.block_number = t.block_number
+                         AND tx.tx_index = t.tx_index
+                        WHERE t.token_id = {token_id}
+                          AND tx.success IS TRUE;
+                        """
+                    )
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+        else:
+            raise RuntimeError(f"{symbol}: public.{view} disappeared before refresh")
         print(f"[base] {view} | success=true | refreshed")
         return True
 
@@ -573,7 +679,7 @@ def setup_filtered_view(
     force_refresh: bool = False,
 ) -> str:
     base_view = transfer_view_name(symbol)
-    ensure_materialized_view_exists(conn, base_view)
+    ensure_transfer_relation_exists(conn, base_view)
 
     if transfer_filter == "all":
         return base_view
@@ -1398,7 +1504,7 @@ def run_pipeline() -> None:
                     allow_destructive_rebuilds=allow_destructive_rebuilds,
                     force_refresh=base_changed and transfer_filter != "all",
                 )
-                ensure_materialized_view_exists(conn, view)
+                ensure_transfer_relation_exists(conn, view)
 
                 if analyses.get("monthly_activity", False):
                     monthly_activity(
