@@ -1,131 +1,73 @@
 settings:
-  # Safety check against accidentally running on the BSC database.
+  # Refuse to run against the wrong database (important after the earlier BSC/ETH DSN mix-up).
   expected_database: ethereum1
 
-  # Reads decimals() from ETH_RPC_URL before each token is processed.
-  verify_decimals: true
+  # Keep false while the local Ethereum RPC is unavailable. The configured decimals are still
+  # validated indirectly because each token address must exist in public.token.
+  verify_decimals: false
+
+  # Required for the one-time migration of old token views that do not yet contain
+  # `eth_tx.success IS TRUE`. With rebuild_token_view: if_legacy, already-migrated
+  # views are reused and are NOT rebuilt again.
+  allow_destructive_rebuilds: true
+
+
+# Rebuild modes used below:
+#   false / never  -> never drop an existing view
+#   true / always  -> rebuild every run (normally avoid this)
+#   if_legacy      -> rebuild only once when an existing view predates the current definition
+#
+# Address filters supported by pipeline.py:
+#   all, eoa_eoa, eoa_sc, sc_eoa, sc_sc
+#
+# FINAL supervisor analysis: run all five ERC-20 datasets for every enabled token:
+#   all, eoa_eoa, eoa_sc, sc_eoa, sc_sc
+# Each subset goes through the same complete downstream analysis.
+#
+# Mint/burn handling:
+#   - Main activity/user/adoption/size analyses EXCLUDE every Transfer event where
+#     either from or to is the Ethereum zero address.
+#   - monthly_mint_burn runs once per token on the successful-transaction base view
+#     and stores minting and burning separately in <token>_all_monthly_mint_burn.csv.
+
+
+# Native ETH analysis. This is intentionally `all` only: no EOA/SC splitting.
+# Source: eth_tx.value, i.e. top-level Ethereum transaction value only.
+# Internal ETH movements from execution traces are outside the dataset.
+# Contract-creation transactions (to_id IS NULL) are excluded because eth_tx does
+# not store the newly created contract address as to_id.
+native_eth:
+  enabled: true
+  symbol: ETH
+  decimals: 18
+  setup_view: true
+  rebuild_view: if_legacy
+  # Set true if eth_tx has grown after eth_native_transfers was last built/refreshed.
+  refresh_view: false
+  # false = literal `all` top-level transfers, including rare sends to zero address.
+  exclude_zero_address: false
+  analyses:
+    monthly_activity: true
+    monthly_summary: true
+    monthly_adoption_and_funded_by: true
+    monthly_top_users: true
+    transfer_size_histogram_all_time: true
+    monthly_transfer_size_buckets: true
+
 
 tokens:
-  # New token views: create once, then run every current analysis.
-  A7A5:
+  USDT:
     enabled: true
-    address: "0x6fA0BE17e4beA2fCfA22ef89BF8ac9aab0AB0fc9"
+    address: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
     decimals: 6
     setup_token_view: true
-    transfer_filter: all
+    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
+    refresh_token_view: false
+    rebuild_token_view: if_legacy
+    rebuild_filtered_views: if_legacy
+    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
     analyses:
-      monthly_activity: true
-      monthly_summary: true
-      monthly_adoption_and_funded_by: true
-      monthly_top_users: true
-      transfer_size_histogram_all_time: true
-      monthly_transfer_size_buckets: true
-
-  MXNT:
-    enabled: true
-    address: "0xed03Ed872159e199065401b6d0D487d78d9464AA"
-    decimals: 6
-    setup_token_view: true
-    transfer_filter: all
-    analyses:
-      monthly_activity: true
-      monthly_summary: true
-      monthly_adoption_and_funded_by: true
-      monthly_top_users: true
-      transfer_size_histogram_all_time: true
-      monthly_transfer_size_buckets: true
-
-  USDS:
-    enabled: true
-    address: "0xdC035D45d973E3EC169d2276DDab16f1e407384F"
-    decimals: 18
-    setup_token_view: true
-    transfer_filter: all
-    analyses:
-      monthly_activity: true
-      monthly_summary: true
-      monthly_adoption_and_funded_by: true
-      monthly_top_users: true
-      transfer_size_histogram_all_time: true
-      monthly_transfer_size_buckets: true
-
-  PYUSD:
-    enabled: true
-    address: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
-    decimals: 6
-    setup_token_view: true
-    transfer_filter: all
-    analyses:
-      monthly_activity: true
-      monthly_summary: true
-      monthly_adoption_and_funded_by: true
-      monthly_top_users: true
-      transfer_size_histogram_all_time: true
-      monthly_transfer_size_buckets: true
-
-  EURC:
-    enabled: true
-    address: "0x1aBaEA1f7C830bD89Acc67eC4af516284b1bC33c"
-    decimals: 6
-    setup_token_view: true
-    transfer_filter: all
-    analyses:
-      monthly_activity: true
-      monthly_summary: true
-      monthly_adoption_and_funded_by: true
-      monthly_top_users: true
-      transfer_size_histogram_all_time: true
-      monthly_transfer_size_buckets: true
-
-  CNHT:
-    enabled: true
-    address: "0x6E109E9dD7Fa1a58BC3eff667e8e41fC3cc07AEF"
-    decimals: 6
-    setup_token_view: true
-    transfer_filter: all
-    analyses:
-      monthly_activity: true
-      monthly_summary: true
-      monthly_adoption_and_funded_by: true
-      monthly_top_users: true
-      transfer_size_histogram_all_time: true
-      monthly_transfer_size_buckets: true
-
-  BRZ:
-    enabled: true
-    address: "0x01d33FD36ec67c6Ada32cf36b31e88EE190B1839"
-    decimals: 18
-    setup_token_view: true
-    transfer_filter: all
-    analyses:
-      monthly_activity: true
-      monthly_summary: true
-      monthly_adoption_and_funded_by: true
-      monthly_top_users: true
-      transfer_size_histogram_all_time: true
-      monthly_transfer_size_buckets: true
-
-  USDE:
-    enabled: true
-    address: "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3"
-    decimals: 18
-    setup_token_view: true
-    transfer_filter: all
-    analyses:
-      monthly_activity: true
-      monthly_summary: true
-      monthly_adoption_and_funded_by: true
-      monthly_top_users: true
-      transfer_size_histogram_all_time: true
-      monthly_transfer_size_buckets: true
-
-  DAI:
-    enabled: true
-    address: "0x6B175474E89094C44Da98b954EedeAC495271d0F"
-    decimals: 18
-    setup_token_view: true
-    transfer_filter: all
-    analyses:
+      monthly_mint_burn: true
       monthly_activity: true
       monthly_summary: true
       monthly_adoption_and_funded_by: true
@@ -138,8 +80,13 @@ tokens:
     address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
     decimals: 6
     setup_token_view: true
-    transfer_filter: all
+    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
+    refresh_token_view: false
+    rebuild_token_view: if_legacy
+    rebuild_filtered_views: if_legacy
+    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
     analyses:
+      monthly_mint_burn: true
       monthly_activity: true
       monthly_summary: true
       monthly_adoption_and_funded_by: true
@@ -147,32 +94,274 @@ tokens:
       transfer_size_histogram_all_time: true
       monthly_transfer_size_buckets: true
 
-  # Existing, already-refreshed views: rerun only the two bucket analyses
-  # so their CSVs use the new 100K-1M, 1M-10M and >=10M buckets.
+  DAI:
+    enabled: true
+    address: "0x6B175474E89094C44Da98b954EedeAC495271d0F"
+    decimals: 18
+    setup_token_view: true
+    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
+    refresh_token_view: false
+    rebuild_token_view: if_legacy
+    rebuild_filtered_views: if_legacy
+    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
+    analyses:
+      monthly_mint_burn: true
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  FRAX:
+    enabled: true
+    address: "0x853d955aCEf822Db058eb8505911ED77F175b99e"
+    decimals: 18
+    setup_token_view: true
+    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
+    refresh_token_view: false
+    rebuild_token_view: if_legacy
+    rebuild_filtered_views: if_legacy
+    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
+    analyses:
+      monthly_mint_burn: true
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  PYUSD:
+    enabled: true
+    address: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
+    decimals: 6
+    setup_token_view: true
+    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
+    refresh_token_view: false
+    rebuild_token_view: if_legacy
+    rebuild_filtered_views: if_legacy
+    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
+    analyses:
+      monthly_mint_burn: true
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  USDS:
+    enabled: true
+    address: "0xdC035D45d973E3EC169d2276DDab16f1e407384F"
+    decimals: 18
+    setup_token_view: true
+    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
+    refresh_token_view: false
+    rebuild_token_view: if_legacy
+    rebuild_filtered_views: if_legacy
+    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
+    analyses:
+      monthly_mint_burn: true
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  USDE:
+    enabled: true
+    address: "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3"
+    decimals: 18
+    setup_token_view: true
+    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
+    refresh_token_view: false
+    rebuild_token_view: if_legacy
+    rebuild_filtered_views: if_legacy
+    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
+    analyses:
+      monthly_mint_burn: true
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  USD1:
+    enabled: true
+    address: "0x8d0D000Ee44948FC98c9B98A4FA4921476f08B0d"
+    decimals: 18
+    setup_token_view: true
+    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
+    refresh_token_view: false
+    rebuild_token_view: if_legacy
+    rebuild_filtered_views: if_legacy
+    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
+    analyses:
+      monthly_mint_burn: true
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  RLUSD:
+    enabled: true
+    # Ripple explicitly instructs users to interact with the Ethereum proxy contract.
+    address: "0x8292Bb45bf1Ee4d140127049757C2E0fF06317eD"
+    decimals: 18
+    setup_token_view: true
+    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
+    refresh_token_view: false
+    rebuild_token_view: if_legacy
+    rebuild_filtered_views: if_legacy
+    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
+    analyses:
+      monthly_mint_burn: true
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  EURC:
+    enabled: true
+    address: "0x1aBaEA1f7C830bD89Acc67eC4af516284b1bC33c"
+    decimals: 6
+    setup_token_view: true
+    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
+    refresh_token_view: false
+    rebuild_token_view: if_legacy
+    rebuild_filtered_views: if_legacy
+    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
+    analyses:
+      monthly_mint_burn: true
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  MXNT:
+    enabled: true
+    address: "0xed03Ed872159e199065401b6d0D487d78d9464AA"
+    decimals: 6
+    setup_token_view: true
+    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
+    refresh_token_view: false
+    rebuild_token_view: if_legacy
+    rebuild_filtered_views: if_legacy
+    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
+    analyses:
+      monthly_mint_burn: true
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  CNHT:
+    enabled: true
+    address: "0x6E109E9dD7Fa1a58BC3eff667e8e41fC3cc07AEF"
+    decimals: 6
+    setup_token_view: true
+    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
+    refresh_token_view: false
+    rebuild_token_view: if_legacy
+    rebuild_filtered_views: if_legacy
+    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
+    analyses:
+      monthly_mint_burn: true
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  BRZ:
+    enabled: true
+    address: "0x01d33FD36ec67c6Ada32cf36b31e88EE190B1839"
+    decimals: 18
+    setup_token_view: true
+    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
+    refresh_token_view: false
+    rebuild_token_view: if_legacy
+    rebuild_filtered_views: if_legacy
+    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
+    analyses:
+      monthly_mint_burn: true
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  A7A5:
+    enabled: true
+    address: "0x6fA0BE17e4beA2fCfA22ef89BF8ac9aab0AB0fc9"
+    decimals: 6
+    setup_token_view: true
+    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
+    refresh_token_view: false
+    rebuild_token_view: if_legacy
+    rebuild_filtered_views: if_legacy
+    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
+    analyses:
+      monthly_mint_burn: true
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
+      transfer_size_histogram_all_time: true
+      monthly_transfer_size_buckets: true
+
+  # Kept as your crypto-denominated comparison asset.
   WBTC:
     enabled: true
     address: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"
     decimals: 8
-    setup_token_view: false
-    transfer_filter: all
+    setup_token_view: true
+    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
+    refresh_token_view: false
+    rebuild_token_view: if_legacy
+    rebuild_filtered_views: if_legacy
+    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
     analyses:
-      monthly_activity: false
-      monthly_summary: false
-      monthly_adoption_and_funded_by: false
-      monthly_top_users: false
+      monthly_mint_burn: true
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
       transfer_size_histogram_all_time: true
       monthly_transfer_size_buckets: true
 
-  USDT:
-    enabled: true
-    address: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+  # BlackRock USD Institutional Digital Liquidity Fund (BUIDL) is deliberately
+  # disabled for now. It is a tokenized fund/security that seeks a stable $1 value,
+  # rather than a conventional stablecoin. Confirm thesis scope and the exact
+  # Ethereum token contract before enabling it.
+  BUIDL:
+    enabled: false
+    address: ""
     decimals: 6
-    setup_token_view: false
-    transfer_filter: all
+    setup_token_view: true
+    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
+    refresh_token_view: false
+    rebuild_token_view: if_legacy
+    rebuild_filtered_views: if_legacy
+    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
     analyses:
-      monthly_activity: false
-      monthly_summary: false
-      monthly_adoption_and_funded_by: false
-      monthly_top_users: false
+      monthly_mint_burn: true
+      monthly_activity: true
+      monthly_summary: true
+      monthly_adoption_and_funded_by: true
+      monthly_top_users: true
       transfer_size_histogram_all_time: true
       monthly_transfer_size_buckets: true
