@@ -1,0 +1,74 @@
+settings:
+  # Hard safety check: refuse to run against the Ethereum DB by accident.
+  expected_database: bsc1
+
+  # Dedicated state schema. `reset` drops ONLY this schema, never raw scraper tables.
+  analysis_schema: analysis_bsc
+
+  # Start conservatively. 100k BSC blocks still represents a large raw chunk.
+  # After the first chunks are stable, 250000 can be benchmarked.
+  chunk_size_blocks: 100000
+  native_chunk_size_blocks: 100000
+
+  # Relative to bsc/pipeline.py. CSV file names/columns match the Ethereum pipeline
+  # for the `all` transfer filter, so the plotting pipeline can consume them.
+  output_dir: output
+
+range:
+  start_block: 1
+  # Exclusive bound: includes block 116,000,000.
+  end_block_exclusive: 116000001
+
+# Native BNB is the BSC analogue of the Ethereum pipeline's native ETH source.
+# It uses public.transaction.value, success=true, value>0, to_id IS NOT NULL.
+# Internal BNB movements from execution traces are not included.
+native_bnb:
+  enabled: true
+  symbol: BNB
+  decimals: 18
+  exclude_zero_address: false
+
+# EOA/SC filters are intentionally deferred. All BEP-20 outputs use filter=all.
+# Main behavioural analyses exclude zero-address mint/burn events exactly like
+# the Ethereum pipeline; mint/burn is exported separately.
+tokens:
+  USDT:
+    enabled: true
+    # Binance-Peg BSC-USD / historical BEP20USDT contract
+    address: "0x55d398326f99059fF775485246999027B3197955"
+    decimals: 18
+
+  USDC:
+    enabled: true
+    # Binance-Peg USD Coin
+    address: "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d"
+    decimals: 18
+
+  USD1:
+    enabled: true
+    address: "0x8d0D000Ee44948FC98c9B98A4FA4921476f08B0d"
+    decimals: 18
+
+  DAI:
+    enabled: true
+    # Binance-Peg Dai
+    address: "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3"
+    decimals: 18
+
+  USDE:
+    enabled: true
+    # Ethena USDe on BSC
+    address: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34"
+    decimals: 18
+
+  BTCB:
+    enabled: true
+    # Binance-Peg BTCB (BSC Bitcoin benchmark)
+    address: "0x7130d2A12B9bCbFAe4f2634d864A1Ee1ce3Ead9c"
+    decimals: 18
+
+  ETH:
+    enabled: true
+    # Binance-Peg Ethereum Token (not native ETH)
+    address: "0x2170Ed0880ac9A755fd29B2688956BD959F933F8"
+    decimals: 18
