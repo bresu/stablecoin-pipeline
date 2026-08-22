@@ -26,6 +26,7 @@ import hashlib
 import json
 import os
 import re
+import time
 from pathlib import Path
 
 import pandas as pd
@@ -926,6 +927,55 @@ def aggregate_native_bnb(
             raise
 
 
+
+def benchmark_range(
+    conn,
+    cfg: dict,
+    resolved: list[dict],
+    block_ts_col: str,
+    start: int,
+    end: int,
+) -> None:
+    """
+    Read-only performance test for one representative block range.
+
+    It builds the same TEMP chunk tables used by the real aggregation, reports
+    elapsed time and selected-row counts, and then rolls the transaction back.
+    No progress rows or aggregate state are written.
+    """
+    if start < 0 or end <= start:
+        raise ValueError("benchmark requires 0 <= start < end")
+
+    print(f"[benchmark] blocks {start:,}-{end-1:,} ({end-start:,} blocks)")
+    try:
+        t0 = time.perf_counter()
+        token_rows = create_token_chunk(
+            conn, resolved, start, end, block_ts_col
+        )
+        token_seconds = time.perf_counter() - t0
+        print(
+            f"[benchmark] BEP20 selected={token_rows:,} "
+            f"elapsed={token_seconds:.2f}s"
+        )
+
+        native = cfg.get("native_bnb") or {}
+        if native.get("enabled", True):
+            symbol = str(native.get("symbol", "BNB")).strip().upper()
+            t0 = time.perf_counter()
+            native_rows = create_native_chunk(
+                conn, symbol, start, end, block_ts_col
+            )
+            native_seconds = time.perf_counter() - t0
+            print(
+                f"[benchmark] BNB selected={native_rows:,} "
+                f"elapsed={native_seconds:.2f}s"
+            )
+
+        print("[benchmark] rolling back; no aggregation state was changed")
+    finally:
+        conn.rollback()
+
+
 def export_query(conn, sql: str, output_path: Path, params=None) -> None:
     with conn.cursor() as cur:
         cur.execute(sql, params)
@@ -1252,7 +1302,19 @@ def main() -> None:
         "command",
         nargs="?",
         default="run",
-        choices=["run", "tokens", "bnb", "export", "status", "reset"],
+        choices=[
+            "run", "tokens", "bnb", "export", "status", "reset", "benchmark"
+        ],
+    )
+    parser.add_argument(
+        "--start-block",
+        type=int,
+        help="Benchmark start block (inclusive); used only by benchmark.",
+    )
+    parser.add_argument(
+        "--end-block",
+        type=int,
+        help="Benchmark end block (exclusive); used only by benchmark.",
     )
     args = parser.parse_args()
 
@@ -1297,6 +1359,21 @@ def main() -> None:
         create_state_schema(conn, schema)
         seed_assets(conn, schema, resolved, cfg)
         ensure_fingerprint(conn, schema, config_fingerprint(cfg))
+
+        if args.command == "benchmark":
+            if args.start_block is None or args.end_block is None:
+                raise RuntimeError(
+                    "benchmark requires --start-block and --end-block"
+                )
+            benchmark_range(
+                conn,
+                cfg,
+                resolved,
+                block_ts_col,
+                args.start_block,
+                args.end_block,
+            )
+            return
 
         if args.command == "status":
             show_status(conn, cfg, schema)
