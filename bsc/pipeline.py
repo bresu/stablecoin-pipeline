@@ -976,6 +976,124 @@ def benchmark_range(
         conn.rollback()
 
 
+
+def benchmark_full_range(
+    conn,
+    cfg: dict,
+    schema: str,
+    resolved: list[dict],
+    zero_id: int,
+    block_ts_col: str,
+    start: int,
+    end: int,
+) -> None:
+    """
+    Benchmark the complete aggregation work for one block range and roll it back.
+
+    Unlike `benchmark`, this also executes the persistent aggregate-table
+    INSERT/UPSERT work. The surrounding transaction is rolled back at the end,
+    so progress and aggregate results are not retained.
+    """
+    if start < 0 or end <= start:
+        raise ValueError("benchmark-full requires 0 <= start < end")
+
+    print(
+        f"[benchmark-full] blocks {start:,}-{end-1:,} "
+        f"({end-start:,} blocks)"
+    )
+
+    try:
+        total_start = time.perf_counter()
+
+        t0 = time.perf_counter()
+        token_rows = create_token_chunk(
+            conn, resolved, start, end, block_ts_col
+        )
+        token_extract_seconds = time.perf_counter() - t0
+        print(
+            f"[benchmark-full] BEP20 extract selected={token_rows:,} "
+            f"elapsed={token_extract_seconds:.2f}s"
+        )
+
+        if token_rows:
+            t0 = time.perf_counter()
+            update_common_state(
+                conn,
+                schema,
+                "chunk_transfers",
+                exclude_zero_address=True,
+                zero_id=zero_id,
+                one_row_per_transaction=False,
+            )
+            common_seconds = time.perf_counter() - t0
+            print(
+                f"[benchmark-full] BEP20 common aggregates "
+                f"elapsed={common_seconds:.2f}s"
+            )
+
+            t0 = time.perf_counter()
+            update_mint_burn_state(
+                conn,
+                schema,
+                "chunk_transfers",
+                zero_id,
+            )
+            mint_burn_seconds = time.perf_counter() - t0
+            print(
+                f"[benchmark-full] BEP20 mint/burn "
+                f"elapsed={mint_burn_seconds:.2f}s"
+            )
+
+        native = cfg.get("native_bnb") or {}
+        if native.get("enabled", True):
+            symbol = str(native.get("symbol", "BNB")).strip().upper()
+
+            t0 = time.perf_counter()
+            native_rows = create_native_chunk(
+                conn, symbol, start, end, block_ts_col
+            )
+            native_extract_seconds = time.perf_counter() - t0
+            print(
+                f"[benchmark-full] BNB extract selected={native_rows:,} "
+                f"elapsed={native_extract_seconds:.2f}s"
+            )
+
+            if native_rows:
+                t0 = time.perf_counter()
+                update_common_state(
+                    conn,
+                    schema,
+                    "chunk_native",
+                    exclude_zero_address=bool(
+                        native.get("exclude_zero_address", False)
+                    ),
+                    zero_id=None,
+                    one_row_per_transaction=True,
+                )
+                native_agg_seconds = time.perf_counter() - t0
+                print(
+                    f"[benchmark-full] BNB common aggregates "
+                    f"elapsed={native_agg_seconds:.2f}s"
+                )
+
+        total_seconds = time.perf_counter() - total_start
+        print(
+            f"[benchmark-full] total before rollback={total_seconds:.2f}s"
+        )
+        print(
+            "[benchmark-full] rolling back; no aggregation state "
+            "or progress is retained"
+        )
+
+    finally:
+        t0 = time.perf_counter()
+        conn.rollback()
+        print(
+            f"[benchmark-full] rollback elapsed="
+            f"{time.perf_counter() - t0:.2f}s"
+        )
+
+
 def export_query(conn, sql: str, output_path: Path, params=None) -> None:
     with conn.cursor() as cur:
         cur.execute(sql, params)
@@ -1303,18 +1421,19 @@ def main() -> None:
         nargs="?",
         default="run",
         choices=[
-            "run", "tokens", "bnb", "export", "status", "reset", "benchmark"
+            "run", "tokens", "bnb", "export", "status", "reset",
+            "benchmark", "benchmark-full"
         ],
     )
     parser.add_argument(
         "--start-block",
         type=int,
-        help="Benchmark start block (inclusive); used only by benchmark.",
+        help="Benchmark start block (inclusive); used by benchmark commands.",
     )
     parser.add_argument(
         "--end-block",
         type=int,
-        help="Benchmark end block (exclusive); used only by benchmark.",
+        help="Benchmark end block (exclusive); used by benchmark commands.",
     )
     args = parser.parse_args()
 
@@ -1369,6 +1488,23 @@ def main() -> None:
                 conn,
                 cfg,
                 resolved,
+                block_ts_col,
+                args.start_block,
+                args.end_block,
+            )
+            return
+
+        if args.command == "benchmark-full":
+            if args.start_block is None or args.end_block is None:
+                raise RuntimeError(
+                    "benchmark-full requires --start-block and --end-block"
+                )
+            benchmark_full_range(
+                conn,
+                cfg,
+                schema,
+                resolved,
+                zero_id,
                 block_ts_col,
                 args.start_block,
                 args.end_block,
