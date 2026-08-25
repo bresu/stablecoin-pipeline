@@ -247,44 +247,6 @@ tokens:
       transfer_size_histogram_all_time: true
       monthly_transfer_size_buckets: true
 
-  MXNT:
-    enabled: true
-    address: "0xed03Ed872159e199065401b6d0D487d78d9464AA"
-    decimals: 6
-    setup_token_view: true
-    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
-    refresh_token_view: false
-    rebuild_token_view: if_legacy
-    rebuild_filtered_views: if_legacy
-    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
-    analyses:
-      monthly_mint_burn: true
-      monthly_activity: true
-      monthly_summary: true
-      monthly_adoption_and_funded_by: true
-      monthly_top_users: true
-      transfer_size_histogram_all_time: true
-      monthly_transfer_size_buckets: true
-
-  CNHT:
-    enabled: true
-    address: "0x6E109E9dD7Fa1a58BC3eff667e8e41fC3cc07AEF"
-    decimals: 6
-    setup_token_view: true
-    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
-    refresh_token_view: false
-    rebuild_token_view: if_legacy
-    rebuild_filtered_views: if_legacy
-    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
-    analyses:
-      monthly_mint_burn: true
-      monthly_activity: true
-      monthly_summary: true
-      monthly_adoption_and_funded_by: true
-      monthly_top_users: true
-      transfer_size_histogram_all_time: true
-      monthly_transfer_size_buckets: true
-
   BRZ:
     enabled: true
     address: "0x01d33FD36ec67c6Ada32cf36b31e88EE190B1839"
@@ -343,25 +305,3 @@ tokens:
       transfer_size_histogram_all_time: true
       monthly_transfer_size_buckets: true
 
-  # BlackRock USD Institutional Digital Liquidity Fund (BUIDL) is deliberately
-  # disabled for now. It is a tokenized fund/security that seeks a stable $1 value,
-  # rather than a conventional stablecoin. Confirm thesis scope and the exact
-  # Ethereum token contract before enabling it.
-  BUIDL:
-    enabled: false
-    address: ""
-    decimals: 6
-    setup_token_view: true
-    # Set true for the final run if new blocks were ingested after this base view was last built/refreshed.
-    refresh_token_view: false
-    rebuild_token_view: if_legacy
-    rebuild_filtered_views: if_legacy
-    transfer_filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
-    analyses:
-      monthly_mint_burn: true
-      monthly_activity: true
-      monthly_summary: true
-      monthly_adoption_and_funded_by: true
-      monthly_top_users: true
-      transfer_size_histogram_all_time: true
-      monthly_transfer_size_buckets: true
