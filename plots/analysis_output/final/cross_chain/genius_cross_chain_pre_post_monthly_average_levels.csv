@@ -1,0 +1,99 @@
+chain,symbol,metric,metric_label,pre_mean,post_mean,pct_change,pre_months,post_months,post_period,sub_cent_transfer_filter
+Ethereum,USDT,token_volume,Transfer volume,280422800789.0604,678030144210.857,141.78852158348022,6,6,Aug 2025-Jan 2026,False
+Ethereum,USDT,transfer_count,Transfer-event count,6812368.5,11500723.0,68.82121100759598,6,6,Aug 2025-Jan 2026,True
+Ethereum,USDT,active_addresses,Active addresses,1728875.5,2768424.8,60.12863852833821,6,5,Aug-Dec 2025,False
+Ethereum,USDT,newly_adopted_addresses,First-time participants,981983.5,1692126.4,72.31719270232135,6,5,Aug-Dec 2025,False
+Ethereum,USDT,average_transfer_size,Average transfer size,41606.770986014635,59866.68404212364,43.88687856177722,6,6,Aug 2025-Jan 2026,True
+Ethereum,USDT,volume_per_active_address,Volume per active address,164223.44529768382,260782.36140801347,58.79727826638861,6,5,Aug-Dec 2025,False
+Ethereum,USDT,transfers_per_active_address,Transfer events per active address,3.94482279092044,4.0212095694430605,1.936380480726152,6,5,Aug-Dec 2025,True
+BSC,USDT,token_volume,Transfer volume,219698869070.03354,378778169407.5454,72.40788312242157,6,6,Aug 2025-Jan 2026,False
+BSC,USDT,transfer_count,Transfer-event count,149824996.0,301001865.1666667,100.90230148690722,6,6,Aug 2025-Jan 2026,True
+BSC,USDT,active_addresses,Active addresses,13211221.0,18816402.2,42.42742741189478,6,5,Aug-Dec 2025,False
+BSC,USDT,newly_adopted_addresses,First-time participants,8006754.666666667,10723713.4,33.93333312240032,6,5,Aug-Dec 2025,False
+BSC,USDT,average_transfer_size,Average transfer size,1600.6844620003824,1242.8013392880914,-22.35813061276567,6,6,Aug 2025-Jan 2026,True
+BSC,USDT,volume_per_active_address,Volume per active address,15480.521251648059,20351.21698838932,31.46338329029279,6,5,Aug-Dec 2025,False
+BSC,USDT,transfers_per_active_address,Transfer events per active address,10.43013605870194,16.129875337878914,54.646835353807674,6,5,Aug-Dec 2025,True
+Ethereum,USDC,token_volume,Transfer volume,533062736200.288,1369319023895.9114,156.87764889673628,6,6,Aug 2025-Jan 2026,False
+Ethereum,USDC,transfer_count,Transfer-event count,5686864.333333333,10323529.0,81.53288692837349,6,6,Aug 2025-Jan 2026,True
+Ethereum,USDC,active_addresses,Active addresses,1030018.3333333334,1950616.0,89.37682338987494,6,5,Aug-Dec 2025,False
+Ethereum,USDC,newly_adopted_addresses,First-time participants,581536.0,1139753.4,95.99017085786605,6,5,Aug-Dec 2025,False
+Ethereum,USDC,average_transfer_size,Average transfer size,94639.4193281909,131993.8764959649,39.47029412578718,6,6,Aug 2025-Jan 2026,True
+Ethereum,USDC,volume_per_active_address,Volume per active address,522412.7891727053,687287.2781601431,31.560193855233432,6,5,Aug-Dec 2025,False
+Ethereum,USDC,transfers_per_active_address,Transfer events per active address,5.521924848300919,5.284843871357522,-4.293448090231545,6,5,Aug-Dec 2025,True
+BSC,USDC,token_volume,Transfer volume,27204313504.6909,32608069225.183533,19.863598908904102,6,6,Aug 2025-Jan 2026,False
+BSC,USDC,transfer_count,Transfer-event count,18040600.166666668,42868612.666666664,137.6229852146179,6,6,Aug 2025-Jan 2026,True
+BSC,USDC,active_addresses,Active addresses,666646.5,1131183.8,69.6827029017628,6,5,Aug-Dec 2025,False
+BSC,USDC,newly_adopted_addresses,First-time participants,427252.8333333333,658206.0,54.05538562841596,6,5,Aug-Dec 2025,False
+BSC,USDC,average_transfer_size,Average transfer size,2435.510643770464,779.9727495797264,-67.97498087003903,6,6,Aug 2025-Jan 2026,True
+BSC,USDC,volume_per_active_address,Volume per active address,37416.39708084183,29317.721104662865,-21.64472426001085,6,5,Aug-Dec 2025,False
+BSC,USDC,transfers_per_active_address,Transfer events per active address,22.891886122865188,38.20703159976679,66.90206912048336,6,5,Aug-Dec 2025,True
+Ethereum,DAI,token_volume,Transfer volume,184461910855.8467,63594715034.14002,-65.52420240087504,6,6,Aug 2025-Jan 2026,False
+Ethereum,DAI,transfer_count,Transfer-event count,289417.0,463342.6666666667,60.0951798500664,6,6,Aug 2025-Jan 2026,True
+Ethereum,DAI,active_addresses,Active addresses,41177.833333333336,73485.4,78.45863672607022,6,5,Aug-Dec 2025,False
+Ethereum,DAI,newly_adopted_addresses,First-time participants,21815.0,49199.6,125.53105661242263,6,5,Aug-Dec 2025,False
+Ethereum,DAI,average_transfer_size,Average transfer size,632043.4950148588,141484.8703834935,-77.61469400453726,6,6,Aug 2025-Jan 2026,True
+Ethereum,DAI,volume_per_active_address,Volume per active address,4451589.401803789,917349.508986843,-79.39276455696628,6,5,Aug-Dec 2025,False
+Ethereum,DAI,transfers_per_active_address,Transfer events per active address,6.970961370048863,6.196929022129879,-11.10366715335216,6,5,Aug-Dec 2025,True
+BSC,DAI,token_volume,Transfer volume,52665975.96370997,108838723.31111501,106.658514001737,6,6,Aug 2025-Jan 2026,False
+BSC,DAI,transfer_count,Transfer-event count,96775.0,151187.83333333334,56.22612589339535,6,6,Aug 2025-Jan 2026,True
+BSC,DAI,active_addresses,Active addresses,8366.333333333334,19191.6,129.39081238296342,6,5,Aug-Dec 2025,False
+BSC,DAI,newly_adopted_addresses,First-time participants,4362.0,12014.8,175.44245758826227,6,5,Aug-Dec 2025,False
+BSC,DAI,average_transfer_size,Average transfer size,540.8287216434254,733.5792550572929,35.63984782985512,6,6,Aug 2025-Jan 2026,True
+BSC,DAI,volume_per_active_address,Volume per active address,6435.467203354606,6000.843589896217,-6.753567374748382,6,5,Aug-Dec 2025,False
+BSC,DAI,transfers_per_active_address,Transfer events per active address,11.923635768047468,8.230516399996343,-30.97309780249925,6,5,Aug-Dec 2025,True
+Ethereum,USDE,token_volume,Transfer volume,15633633796.981544,37764134735.627815,141.5569868530444,6,6,Aug 2025-Jan 2026,False
+Ethereum,USDE,transfer_count,Transfer-event count,101857.83333333333,217400.16666666666,113.43490191394214,6,6,Aug 2025-Jan 2026,True
+Ethereum,USDE,active_addresses,Active addresses,15632.333333333334,19776.8,26.512143633921138,6,5,Aug-Dec 2025,False
+Ethereum,USDE,newly_adopted_addresses,First-time participants,7377.5,8574.4,16.223652998983383,6,5,Aug-Dec 2025,False
+Ethereum,USDE,average_transfer_size,Average transfer size,175298.58529792613,161093.16819961066,-8.103554899871469,6,6,Aug 2025-Jan 2026,True
+Ethereum,USDE,volume_per_active_address,Volume per active address,1258461.238724559,2042316.9961016937,62.28684152175927,6,5,Aug-Dec 2025,False
+Ethereum,USDE,transfers_per_active_address,Transfer events per active address,6.7324436557358505,11.10590980482841,64.96105088627799,6,5,Aug-Dec 2025,True
+BSC,USDE,token_volume,Transfer volume,60216016.7932534,796446614.4078094,1222.6491169987903,5,6,Aug 2025-Jan 2026,False
+BSC,USDE,transfer_count,Transfer-event count,4695.2,5579.333333333333,18.83057874708922,5,6,Aug 2025-Jan 2026,True
+BSC,USDE,active_addresses,Active addresses,322.6,1264.0,291.8164910105393,5,5,Aug-Dec 2025,False
+BSC,USDE,newly_adopted_addresses,First-time participants,278.2,974.4,250.25161754133717,5,5,Aug-Dec 2025,False
+BSC,USDE,average_transfer_size,Average transfer size,11762.204563625677,158678.9515882594,1249.057914525395,4,6,Aug 2025-Jan 2026,True
+BSC,USDE,volume_per_active_address,Volume per active address,106117.74419058612,892231.5301905235,740.7939096293708,5,5,Aug-Dec 2025,False
+BSC,USDE,transfers_per_active_address,Transfer events per active address,7.897894819545027,4.623810048244595,-41.4551579390246,5,5,Aug-Dec 2025,True
+Ethereum,USD1,token_volume,Transfer volume,142590133.7034366,4865102090.390461,3311.9486138564475,4,6,Aug 2025-Jan 2026,False
+Ethereum,USD1,transfer_count,Transfer-event count,56771.5,102965.0,81.36741146525985,4,6,Aug 2025-Jan 2026,True
+Ethereum,USD1,active_addresses,Active addresses,28056.0,16244.4,-42.10008554319932,4,5,Aug-Dec 2025,False
+Ethereum,USD1,newly_adopted_addresses,First-time participants,27720.0,8555.4,-69.13636363636364,4,5,Aug-Dec 2025,False
+Ethereum,USD1,average_transfer_size,Average transfer size,76180.03410031162,65218.80944841295,-14.388579345429608,4,6,Aug 2025-Jan 2026,True
+Ethereum,USD1,volume_per_active_address,Volume per active address,275257.42497566895,298743.1119709308,8.532262843531967,4,5,Aug-Dec 2025,False
+Ethereum,USD1,transfers_per_active_address,Transfer events per active address,6.007658377611724,7.4643889489861905,24.247892936175464,4,5,Aug-Dec 2025,True
+BSC,USD1,token_volume,Transfer volume,15372644045.70462,12733859282.36235,-17.16545804024905,4,6,Aug 2025-Jan 2026,False
+BSC,USD1,transfer_count,Transfer-event count,7047081.25,14337973.166666666,103.45973968537207,4,6,Aug 2025-Jan 2026,True
+BSC,USD1,active_addresses,Active addresses,671844.0,457502.4,-31.903477593012664,4,5,Aug-Dec 2025,False
+BSC,USD1,newly_adopted_addresses,First-time participants,665483.75,388345.4,-41.64464571824631,4,5,Aug-Dec 2025,False
+BSC,USD1,average_transfer_size,Average transfer size,828050.7508841773,1005.2072134527672,-99.87860560329432,4,6,Aug 2025-Jan 2026,True
+BSC,USD1,volume_per_active_address,Volume per active address,3442181.2850066293,31343.795941107535,-99.08942053465823,4,5,Aug-Dec 2025,False
+BSC,USD1,transfers_per_active_address,Transfer events per active address,28.673549855959244,33.591806946280215,17.152592249748277,4,5,Aug-Dec 2025,True
+Ethereum,ETH,token_volume,Transfer volume,54764002.47799885,59610733.435502656,8.850213165940435,6,6,Aug 2025-Jan 2026,False
+Ethereum,ETH,transfer_count,Transfer-event count,18036406.666666668,23064601.0,27.878027071911205,6,6,Aug 2025-Jan 2026,False
+Ethereum,ETH,active_addresses,Active addresses,6526998.5,7853250.8,20.319482224486496,6,5,Aug-Dec 2025,False
+Ethereum,ETH,newly_adopted_addresses,First-time participants,3395689.8333333335,3990870.8,17.52754214546195,6,5,Aug-Dec 2025,False
+Ethereum,ETH,average_transfer_size,Average transfer size,3.0499536231147424,2.665074776416699,-12.61917046151635,6,6,Aug 2025-Jan 2026,False
+Ethereum,ETH,volume_per_active_address,Volume per active address,8.412314751262302,7.814287917340596,-7.10894505976456,6,5,Aug-Dec 2025,False
+Ethereum,ETH,transfers_per_active_address,Transfer events per active address,2.767451026225182,2.7011087935934275,-2.3972323991671707,6,5,Aug-Dec 2025,False
+BSC,ETH,token_volume,Transfer volume,2920661.163165154,2752504.1976629104,-5.757496543009111,6,6,Aug 2025-Jan 2026,False
+BSC,ETH,transfer_count,Transfer-event count,3652132.3333333335,7155473.666666667,95.92591433114373,6,6,Aug 2025-Jan 2026,False
+BSC,ETH,active_addresses,Active addresses,175370.33333333334,148030.8,-15.58959991332629,6,5,Aug-Dec 2025,False
+BSC,ETH,newly_adopted_addresses,First-time participants,97145.66666666667,70952.2,-26.96308293044467,6,5,Aug-Dec 2025,False
+BSC,ETH,average_transfer_size,Average transfer size,0.8410458459677846,0.4115600024444889,-51.06568751066,6,6,Aug 2025-Jan 2026,False
+BSC,ETH,volume_per_active_address,Volume per active address,17.32756386647412,19.71727263634906,13.791371875988979,6,5,Aug-Dec 2025,False
+BSC,ETH,transfers_per_active_address,Transfer events per active address,21.93613860932625,51.10446553978296,132.96928620817368,6,5,Aug-Dec 2025,False
+Ethereum,BTC,token_volume,Transfer volume,511587.58733974496,13468308.097366504,2532.64950727239,6,6,Aug 2025-Jan 2026,False
+Ethereum,BTC,transfer_count,Transfer-event count,478780.3333333333,830577.6666666666,73.47781620102747,6,6,Aug 2025-Jan 2026,False
+Ethereum,BTC,active_addresses,Active addresses,36556.166666666664,35731.8,-2.255068684262107,6,5,Aug-Dec 2025,False
+Ethereum,BTC,newly_adopted_addresses,First-time participants,18303.333333333332,17237.4,-5.823711527954822,6,5,Aug-Dec 2025,False
+Ethereum,BTC,average_transfer_size,Average transfer size,1.0742084037811959,14.0998767995479,1212.5829913373016,6,6,Aug 2025-Jan 2026,False
+Ethereum,BTC,volume_per_active_address,Volume per active address,14.252375228013067,318.72202314033615,2136.273028469581,6,5,Aug-Dec 2025,False
+Ethereum,BTC,transfers_per_active_address,Transfer events per active address,13.234861674745853,22.3386140742192,68.78615450016154,6,5,Aug-Dec 2025,False
+BSC,BTC,token_volume,Transfer volume,147981.78418945128,152255.0357563529,2.887687555808127,6,6,Aug 2025-Jan 2026,False
+BSC,BTC,transfer_count,Transfer-event count,3298274.8333333335,5699985.333333333,72.81717326062729,6,6,Aug 2025-Jan 2026,False
+BSC,BTC,active_addresses,Active addresses,308200.5,117594.8,-61.8447082337634,6,5,Aug-Dec 2025,False
+BSC,BTC,newly_adopted_addresses,First-time participants,197116.0,48233.8,-75.53024614947543,6,5,Aug-Dec 2025,False
+BSC,BTC,average_transfer_size,Average transfer size,0.04954766672722314,0.03037357284069607,-38.698278149175046,6,6,Aug 2025-Jan 2026,False
+BSC,BTC,volume_per_active_address,Volume per active address,0.6856534195532001,1.327457691644902,93.60476500065116,6,5,Aug-Dec 2025,False
+BSC,BTC,transfers_per_active_address,Transfer events per active address,13.225564774519556,49.03981923660533,270.79565275795034,6,5,Aug-Dec 2025,False

@@ -1,0 +1,36 @@
+symbol,metric,metric_label,pre_mean,post_mean,pct_change,pre_months,post_months,post_period,address_counts_are_cross_chain_deduplicated
+USDT,token_volume,Transfer volume,500121669859.09393,1056808313618.4027,111.31024254880853,6,6,Aug 2025-Jan 2026,False
+USDT,transfer_count,Transfer-event count,156637364.5,312502588.1666667,99.50705195034529,6,6,Aug 2025-Jan 2026,False
+USDT,active_addresses,Active addresses,14940096.5,21584827.0,44.47582048750489,6,5,Aug-Dec 2025,False
+USDT,newly_adopted_addresses,First-time participants,8988738.166666666,12415839.8,38.12661543577058,6,5,Aug-Dec 2025,False
+USDT,average_transfer_size,Average transfer size,4562.6796180952815,3356.128906523858,-26.443906049995803,6,6,Aug 2025-Jan 2026,False
+USDT,volume_per_active_address,Volume per active address,32982.503780992025,50530.80133405405,53.2048678583801,6,5,Aug-Dec 2025,False
+USDT,transfers_per_active_address,Transfer events per active address,9.708441595842986,14.59476351493617,50.33065163811086,6,5,Aug-Dec 2025,False
+USDC,token_volume,Transfer volume,560267049704.9789,1401927093121.095,150.22479795292458,6,6,Aug 2025-Jan 2026,False
+USDC,transfer_count,Transfer-event count,23727464.5,53192141.666666664,124.17962807052842,6,6,Aug 2025-Jan 2026,False
+USDC,active_addresses,Active addresses,1696664.8333333333,3081799.8,81.63869135811443,6,5,Aug-Dec 2025,False
+USDC,newly_adopted_addresses,First-time participants,1008788.8333333334,1797959.4,78.22951053681038,6,5,Aug-Dec 2025,False
+USDC,average_transfer_size,Average transfer size,40386.72617065861,27607.6318369318,-31.641817857994536,6,6,Aug 2025-Jan 2026,False
+USDC,volume_per_active_address,Volume per active address,334167.82221958507,441233.85742966423,32.03960049143362,6,5,Aug-Dec 2025,False
+USDC,transfers_per_active_address,Transfer events per active address,12.707433578099057,17.647149943564983,38.87265146897485,6,5,Aug-Dec 2025,False
+DAI,token_volume,Transfer volume,184514576831.81046,63703553757.45114,-65.4750563065169,6,6,Aug 2025-Jan 2026,False
+DAI,transfer_count,Transfer-event count,386192.0,614530.5,59.12564216762646,6,6,Aug 2025-Jan 2026,False
+DAI,active_addresses,Active addresses,49544.166666666664,92677.0,87.05935781205324,6,5,Aug-Dec 2025,False
+DAI,newly_adopted_addresses,First-time participants,26177.0,61214.4,133.84803453413303,6,5,Aug-Dec 2025,False
+DAI,average_transfer_size,Average transfer size,473660.3416079441,105355.03193593626,-77.75726133661824,6,6,Aug 2025-Jan 2026,False
+DAI,volume_per_active_address,Volume per active address,3699880.765233299,723334.4215112596,-80.44979102277506,6,5,Aug-Dec 2025,False
+DAI,transfers_per_active_address,Transfer events per active address,7.766758411094313,6.632241588005691,-14.607340193149799,6,5,Aug-Dec 2025,False
+USDE,token_volume,Transfer volume,15683813810.975922,38560581350.03564,145.86227441089608,6,6,Aug 2025-Jan 2026,False
+USDE,transfer_count,Transfer-event count,105770.5,222979.5,110.81445204475729,6,6,Aug 2025-Jan 2026,False
+USDE,active_addresses,Active addresses,15901.166666666666,21040.8,32.3223662833964,6,5,Aug-Dec 2025,False
+USDE,newly_adopted_addresses,First-time participants,7609.333333333333,9548.8,25.487997196425425,6,5,Aug-Dec 2025,False
+USDE,average_transfer_size,Average transfer size,160689.643871696,160469.24442504346,-0.13715846357125194,6,6,Aug 2025-Jan 2026,False
+USDE,volume_per_active_address,Volume per active address,1204551.0143423898,1974988.8590403118,63.96058245142346,6,5,Aug-Dec 2025,False
+USDE,transfers_per_active_address,Transfer events per active address,6.896045338533387,10.73251037352955,55.63282789860662,6,5,Aug-Dec 2025,False
+USD1,token_volume,Transfer volume,15515234179.408058,17598961372.75281,13.43020137014943,4,6,Aug 2025-Jan 2026,False
+USD1,transfer_count,Transfer-event count,7103852.75,14440938.166666666,103.28318554557123,4,6,Aug 2025-Jan 2026,False
+USD1,active_addresses,Active addresses,699900.0,473746.8,-32.31221603086155,4,5,Aug-Dec 2025,False
+USD1,newly_adopted_addresses,First-time participants,693203.75,396900.8,-42.74399121470419,4,5,Aug-Dec 2025,False
+USD1,average_transfer_size,Average transfer size,451699.7387917665,1333.1116583743976,-99.70486773759482,4,6,Aug 2025-Jan 2026,False
+USD1,volume_per_active_address,Volume per active address,2048522.6915000095,42061.538547087956,-97.94673797260752,4,5,Aug-Dec 2025,False
+USD1,transfers_per_active_address,Transfer events per active address,26.578876599910092,32.395873309925875,21.88578846870999,4,5,Aug-Dec 2025,False

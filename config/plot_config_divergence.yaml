@@ -1,0 +1,101 @@
+# Dedicated configuration for ONE output only:
+# Ethereum-vs-BNB-Smart-Chain divergence heatmap around the GENIUS Act.
+run_mode: cross_chain_divergence_only
+
+global:
+  start_date: null
+  end_date: "2026-07-01"
+  template: plotly_white
+  font_size: 13
+  include_plotlyjs: cdn
+
+  # Required outputs: HTML + PDF.
+  export_pdf: true
+  heatmap_static_format: pdf
+  static_width: 1400
+  static_height: 760
+  static_scale: 1.0
+
+  # External editable HTML header.
+  html_logo_px: 58
+  html_logo_slot_px: 140
+  html_title_font_px: 26
+  html_header_gap_px: 20
+  html_header_side_padding_px: 28
+  html_header_top_padding_px: 22
+  html_header_bottom_padding_px: 12
+
+  # GENIUS windows and the exact data-quality treatment used in the thesis.
+  genius_date: "2025-07-18"
+  genius_pre_start: "2025-01-01"
+  genius_pre_end: "2025-07-01"
+  genius_post_start: "2025-08-01"
+  genius_post_end: "2026-02-01"
+  genius_address_post_end: "2026-01-01"
+  genius_address_post_label: "Aug-Dec 2025"
+  genius_post_label: "Aug 2025-Jan 2026"
+
+  genius_dust_filter_enabled: true
+  genius_dust_filter_pegs: [USD]
+  genius_dust_excluded_buckets: ["<0.01"]
+
+# Only the five stablecoins that exist in both datasets are needed.
+# Only the complete transfer set is required for this figure.
+dataset_matrices:
+  ethereum:
+    enabled: true
+    chain: ethereum
+    chain_label: Ethereum
+    input_folder: output/final
+    filters: [all]
+    show_mint_burn: false
+    tokens:
+      - {symbol: USDT, peg: USD, genius_aligned: false}
+      - {symbol: USDC, peg: USD, genius_aligned: true}
+      - {symbol: DAI,  peg: USD, genius_aligned: false}
+      - {symbol: USDE, peg: USD, genius_aligned: false}
+      - {symbol: USD1, peg: USD, genius_aligned: true}
+
+  bsc:
+    enabled: true
+    chain: bsc
+    chain_label: BNB Smart Chain
+    input_folder: bsc/output
+    filters: [all]
+    show_mint_burn: false
+    tokens:
+      - {symbol: USDT, peg: USD, genius_aligned: false}
+      - {symbol: USDC, peg: USD, genius_aligned: true}
+      - {symbol: DAI,  peg: USD, genius_aligned: false}
+      - {symbol: USDE, peg: USD, genius_aligned: false}
+      - {symbol: USD1, peg: USD, genius_aligned: true}
+
+analysis:
+  enabled: false
+
+cross_chain_analysis:
+  enabled: true
+  divergence_only: true
+
+  # Static output is written inside the repository output structure.
+  output_folder: plots/plot_output/divergence_only
+  static_output_folder: plots/plot_output_pdf/divergence_only
+
+  chain_label: Ethereum and BNB Smart Chain
+  chain_logo_paths: [plots/assets/ethereum_logo.svg, plots/assets/bnb_chain_logo.svg]
+  chain_logo_labels: [Ethereum, BNB Smart Chain]
+  html_logo_px: 58
+  html_logo_slot_px: 140
+
+  divergence_assets: [USDT, USDC, DAI, USDE, USD1]
+  divergence_width: 1300
+  divergence_height: 650
+  # Optional manual symmetric color cap in percentage points. Leave absent to
+  # use the robust automatic scale (90th percentile, capped at 300 pp).
+  # divergence_color_limit: 250
+
+  genius_date: "2025-07-18"
+  genius_pre_start: "2025-01-01"
+  genius_pre_end: "2025-07-01"
+  genius_post_start: "2025-08-01"
+  genius_post_end: "2026-02-01"
