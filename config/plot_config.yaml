@@ -1,0 +1,209 @@
+global:
+  start_date: null
+  end_date: "2026-07-01"
+  template: plotly_white
+  font_size: 13
+  include_plotlyjs: cdn
+
+  # HTML is the canonical figure format. Final thesis images can be rendered
+  # from the edited HTML after titles are finalized.
+  export_pdf: true
+  static_width: 1400
+  static_height: 800
+  static_scale: 1.0
+  heatmap_png_scale: 2.5
+
+  # External editable HTML figure header.
+  html_logo_px: 80
+  html_logo_slot_px: 96
+  html_title_font_px: 26
+  html_header_gap_px: 20
+  html_header_side_padding_px: 28
+  html_header_top_padding_px: 22
+  html_header_bottom_padding_px: 12
+
+  top_n: 50
+  top_source_limit: 100
+  cross_token_top_n: 100
+  sender_concentration_top_n: 50
+  top_window_months: 6
+  plot_address_window_stacked: false
+  address_bubble_row_height: 42
+  address_bubble_column_width: 56
+  address_bubble_max_size: 34
+  address_bubble_min_size: 3
+  address_bubble_opacity: 0.82
+
+  genius_date: "2025-07-18"
+  genius_pre_start: "2025-01-01"
+  genius_pre_end: "2025-07-01"
+  genius_post_start: "2025-08-01"
+  genius_post_end: "2026-02-01"
+
+  # Supervisor-approved GENIUS data-quality adjustments.
+  # USD-pegged stablecoin transfer-count metrics exclude the <0.01 bucket.
+  # Address-dependent post-GENIUS averages exclude January 2026 and therefore
+  # use Aug-Dec 2025 (five months) instead of Aug 2025-Jan 2026.
+  genius_dust_filter_enabled: true
+  genius_dust_filter_pegs: [USD]
+  genius_dust_excluded_buckets: ["<0.01"]
+  genius_address_post_end: "2026-01-01"
+  genius_address_post_label: "Aug-Dec 2025"
+  genius_post_label: "Aug 2025-Jan 2026"
+
+  genius_pre_color_darken: 0.20
+
+  regulatory_events:
+    - date: "2025-07-18"
+      label: "GENIUS Act enacted"
+      line_dash: dash
+      line_color: "#4B5563"
+      annotation_position: "top left"
+
+  issuance_adjustments:
+    PYUSD:
+      - month: "2025-10-01"
+        minted_remove: 300000000000000
+        burned_remove: 300000000000000
+        note: "The erroneous 300 trillion PYUSD mint and corresponding burn in October 2025 were excluded from this visualization."
+
+
+dataset_matrices:
+  ethereum:
+    enabled: true
+    chain: ethereum
+    chain_label: Ethereum
+    chain_logo_path: plots/assets/ethereum_logo.svg
+    explorer_address_url: "https://etherscan.io/address/"
+    input_folder: output/final
+    output_root: plots/plot_output/final/ethereum
+    static_output_root: plots/plot_output_pdf/final/ethereum
+    filters: [all, eoa_eoa, eoa_sc, sc_eoa, sc_sc]
+    show_mint_burn: true
+
+    # 12 analyzed stablecoins + WBTC comparison asset.
+    tokens:
+      - {symbol: USDT, primary_color: "#26A17B", secondary_color: "#E67E22", transaction_color: "#4C78A8", peg: USD, genius_aligned: false}
+      - {symbol: USDC, primary_color: "#2775CA", secondary_color: "#E67E22", transaction_color: "#4C78A8", peg: USD, genius_aligned: true}
+      - {symbol: DAI, primary_color: "#F5AC37", secondary_color: "#E67E22", transaction_color: "#4C78A8", peg: USD, genius_aligned: false}
+      - {symbol: FRAX, primary_color: "#8E44AD", secondary_color: "#E67E22", transaction_color: "#4C78A8", peg: USD, genius_aligned: false}
+      - {symbol: PYUSD, primary_color: "#0070E0", secondary_color: "#E67E22", transaction_color: "#4C78A8", peg: USD, genius_aligned: true}
+      - {symbol: USDS, primary_color: "#1AAB9B", secondary_color: "#E67E22", transaction_color: "#4C78A8", peg: USD, genius_aligned: false}
+      - {symbol: USDE, primary_color: "#222222", secondary_color: "#E67E22", transaction_color: "#4C78A8", peg: USD, genius_aligned: false}
+      - {symbol: USD1, primary_color: "#23694F", secondary_color: "#E67E22", transaction_color: "#4C78A8", peg: USD, genius_aligned: true}
+      - {symbol: RLUSD, primary_color: "#36566F", secondary_color: "#E67E22", transaction_color: "#4C78A8", peg: USD, genius_aligned: true}
+      - {symbol: EURC, primary_color: "#3B73B9", secondary_color: "#E67E22", transaction_color: "#4C78A8", peg: EUR, genius_aligned: false}
+      - {symbol: BRZ, primary_color: "#188038", secondary_color: "#E67E22", transaction_color: "#4C78A8", peg: BRL, genius_aligned: false, filters: [all]}
+      - {symbol: A7A5, primary_color: "#7C5AC7", secondary_color: "#E67E22", transaction_color: "#4C78A8", peg: RUB, genius_aligned: false, filters: [all]}
+      - {symbol: WBTC, primary_color: "#F09242", secondary_color: "#E67E22", transaction_color: "#4C78A8", asset_role: comparison, peg: BTC, genius_aligned: false}
+
+    native_eth:
+      enabled: true
+      symbol: ETH
+      primary_color: "#627EEA"
+      secondary_color: "#E67E22"
+      transaction_color: "#4C78A8"
+
+  bsc:
+    enabled: true
+    chain: bsc
+    chain_label: BNB Smart Chain
+    chain_logo_path: plots/assets/bnb_chain_logo.svg
+    explorer_address_url: "https://bscscan.com/address/"
+    input_folder: bsc/output
+    output_root: plots/plot_output/final/bsc
+    static_output_root: plots/plot_output_pdf/final/bsc
+    filters: [all]
+    show_mint_burn: true
+
+    # No native BNB aggregate is available. ETH and BTCB are comparison assets.
+    tokens:
+      - {symbol: USDT, primary_color: "#26A17B", secondary_color: "#E67E22", transaction_color: "#4C78A8", peg: USD, genius_aligned: false}
+      - {symbol: USDC, primary_color: "#2775CA", secondary_color: "#E67E22", transaction_color: "#4C78A8", peg: USD, genius_aligned: true}
+      - {symbol: DAI, primary_color: "#F5AC37", secondary_color: "#E67E22", transaction_color: "#4C78A8", peg: USD, genius_aligned: false}
+      - {symbol: USDE, primary_color: "#222222", secondary_color: "#E67E22", transaction_color: "#4C78A8", peg: USD, genius_aligned: false}
+      - {symbol: USD1, primary_color: "#23694F", secondary_color: "#E67E22", transaction_color: "#4C78A8", peg: USD, genius_aligned: true}
+      - {symbol: BTCB, primary_color: "#F7931A", secondary_color: "#E67E22", transaction_color: "#4C78A8", asset_role: comparison, peg: BTC, genius_aligned: false}
+      - {symbol: ETH, primary_color: "#627EEA", secondary_color: "#E67E22", transaction_color: "#4C78A8", asset_role: comparison, peg: ETH, genius_aligned: false}
+
+
+analysis:
+  enabled: true
+  chains:
+    ethereum:
+      enabled: true
+      chain_label: Ethereum
+      chain_logo_path: plots/assets/ethereum_logo.svg
+      output_folder: plots/plot_output/final/analysis/ethereum
+      static_output_folder: plots/plot_output_pdf/final/analysis/ethereum
+      data_output_folder: plots/analysis_output/final/ethereum
+
+      stablecoins: [USDT, USDC, DAI, FRAX, PYUSD, USDS, USDE, USD1, RLUSD, EURC, BRZ, A7A5]
+      usd_stablecoins: [USDT, USDC, DAI, FRAX, PYUSD, USDS, USDE, USD1, RLUSD]
+      # Include ETH and WBTC in address-overlap analysis as comparison assets.
+      overlap_assets: [USDT, USDC, DAI, FRAX, PYUSD, USDS, USDE, USD1, RLUSD, EURC, BRZ, A7A5, ETH, WBTC]
+      cross_token_top_n: 100
+      top_source_limit: 100
+      genius_date: "2025-07-18"
+      genius_pre_start: "2025-01-01"
+      genius_pre_end: "2025-07-01"
+      genius_post_start: "2025-08-01"
+      genius_post_end: "2026-02-01"
+      genius_plot_start: "2024-07-01"
+      genius_plot_end: "2026-07-01"
+      genius_benchmark_assets: [USDT, USDC, DAI, FRAX, PYUSD, USDS, USDE, USD1, RLUSD, ETH, WBTC]
+
+    bsc:
+      enabled: true
+      chain_label: BNB Smart Chain
+      chain_logo_path: plots/assets/bnb_chain_logo.svg
+      output_folder: plots/plot_output/final/analysis/bsc
+      static_output_folder: plots/plot_output_pdf/final/analysis/bsc
+      data_output_folder: plots/analysis_output/final/bsc
+
+      stablecoins: [USDT, USDC, DAI, USDE, USD1]
+      usd_stablecoins: [USDT, USDC, DAI, USDE, USD1]
+      # ETH and BTCB are used as comparison assets even though native BNB is unavailable.
+      overlap_assets: [USDT, USDC, DAI, USDE, USD1, ETH, BTCB]
+      cross_token_top_n: 100
+      top_source_limit: 100
+      genius_date: "2025-07-18"
+      genius_pre_start: "2025-01-01"
+      genius_pre_end: "2025-07-01"
+      genius_post_start: "2025-08-01"
+      genius_post_end: "2026-02-01"
+      genius_plot_start: "2024-07-01"
+      genius_plot_end: "2026-07-01"
+      genius_benchmark_assets: [USDT, USDC, DAI, USDE, USD1, ETH, BTCB]
+
+
+cross_chain_analysis:
+  enabled: true
+  output_folder: plots/plot_output/final/analysis/cross_chain
+  static_output_folder: plots/plot_output_pdf/final/analysis/cross_chain
+  data_output_folder: plots/analysis_output/final/cross_chain
+
+  # Cross-chain figures use both logos in the external header.
+  chain_label: Ethereum and BNB Smart Chain
+  chain_logo_paths: [plots/assets/ethereum_logo.svg, plots/assets/bnb_chain_logo.svg]
+  chain_logo_labels: [Ethereum, BNB Smart Chain]
+  html_logo_px: 58
+  html_logo_slot_px: 140
+
+  # Same-symbol assets are compared directly. BTC is provided through the alias below.
+  common_assets: [USDT, USDC, DAI, USDE, USD1, ETH, BTC]
+
+  # Additional combined-chain volume heatmap. Each monthly value is the sum of
+  # Ethereum + BSC transfer volume before the pre/post averages are calculated.
+  combined_metric_assets: [USDT, USDC, DAI, USDE, USD1]
+
+  asset_aliases:
+    - {label: BTC, ethereum: WBTC, bsc: BTCB}
+
+  genius_date: "2025-07-18"
+  genius_pre_start: "2025-01-01"
+  genius_pre_end: "2025-07-01"
+  genius_post_start: "2025-08-01"
+  genius_post_end: "2026-02-01"
+  genius_plot_start: "2024-07-01"
+  genius_plot_end: "2026-07-01"
